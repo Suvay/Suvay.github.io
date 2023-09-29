@@ -318,7 +318,7 @@
         'Content-Type': 'application/json',
     };
     
-    if (gmt8Hour === 0 && minute === 0) {
+    if (gmt8Hour === 23 && minute === 59) {
         // Send "INITIATING RESTART IN 1 MINUTE"
         const message = {
             content: 'INITIATING RESTART IN 1 MINUTE',
