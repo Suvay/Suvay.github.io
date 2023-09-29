@@ -307,71 +307,73 @@
 
             // Function to send scheduled messages
             function sendScheduledMessages() {
-                const now = new Date();
-                const hour = now.getUTCHours();
-                const minute = now.getUTCMinutes();
+    const now = new Date();
+    
+    // Convert the current time to GMT+8
+    const gmt8Hour = now.getUTCHours() + 8; // Add 8 hours to UTC time
+    const minute = now.getUTCMinutes();
+    
+    const webhookURL = 'https://discordapp.com/api/webhooks/1157302481123037255/puzWXAVDnDSeX3UJxeFHZWDKGriu1b4Gn19fI0xhrL2DnQ29GBj_bfPXIelnXHIh55m1';
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    
+    if (gmt8Hour === 0 && minute === 0) {
+        // Send "INITIATING RESTART IN 1 MINUTE"
+        const message = {
+            content: 'INITIATING RESTART IN 1 MINUTE',
+        };
+        
+        fetch(webhookURL, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(message),
+        })
+        .then(response => {
+            console.log('Scheduled message sent: INITIATING RESTART IN 1 MINUTE');
+        })
+        .catch(error => {
+            console.error('Error sending scheduled message:', error);
+        });
+    } else if (gmt8Hour === 0 && minute === 1) {
+        // Send "TEST IN PROGRESS"
+        const message = {
+            content: 'TEST IN PROGRESS',
+        };
+        
+        fetch(webhookURL, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(message),
+        })
+        .then(response => {
+            console.log('Scheduled message sent: TEST IN PROGRESS');
+        })
+        .catch(error => {
+            console.error('Error sending scheduled message:', error);
+        });
+    } else if (gmt8Hour === 0 && minute === 2) {
+        // Send "TEST COMPLETE"
+        const message = {
+            content: 'TEST COMPLETE',
+        };
+        
+        fetch(webhookURL, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(message),
+        })
+        .then(response => {
+            console.log('Scheduled message sent: TEST COMPLETE');
+        })
+        .catch(error => {
+            console.error('Error sending scheduled message:', error);
+        });
+    }
+}
 
-                const webhookURL = 'https://discordapp.com/api/webhooks/1157302481123037255/puzWXAVDnDSeX3UJxeFHZWDKGriu1b4Gn19fI0xhrL2DnQ29GBj_bfPXIelnXHIh55m1';
-                const headers = {
-                    'Content-Type': 'application/json',
-                };
-
-                if (hour === 23 && minute === 59) {
-                    // Send "INITIATING RESTART IN 1 MINUTE"
-                    const message = {
-                        content: 'INITIATING RESTART IN 1 MINUTE',
-                    };
-
-                    fetch(webhookURL, {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(message),
-                    })
-                    .then(response => {
-                        console.log('Scheduled message sent: INITIATING RESTART IN 1 MINUTE');
-                    })
-                    .catch(error => {
-                        console.error('Error sending scheduled message:', error);
-                    });
-                } else if (hour === 0 && minute === 1) {
-                    // Send "TEST IN PROGRESS"
-                    const message = {
-                        content: 'TEST IN PROGRESS',
-                    };
-
-                    fetch(webhookURL, {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(message),
-                    })
-                    .then(response => {
-                        console.log('Scheduled message sent: TEST IN PROGRESS');
-                    })
-                    .catch(error => {
-                        console.error('Error sending scheduled message:', error);
-                    });
-                } else if (hour === 0 && minute === 2) {
-                    // Send "TEST COMPLETE"
-                    const message = {
-                        content: 'TEST COMPLETE',
-                    };
-
-                    fetch(webhookURL, {
-                        method: 'POST',
-                        headers: headers,
-                        body: JSON.stringify(message),
-                    })
-                    .then(response => {
-                        console.log('Scheduled message sent: TEST COMPLETE');
-                    })
-                    .catch(error => {
-                        console.error('Error sending scheduled message:', error);
-                    });
-                }
-            }
-
-            // Check and send scheduled messages every minute
-            setInterval(sendScheduledMessages, 60000);
+// Check and send scheduled messages every minute
+setInterval(sendScheduledMessages, 60000);
         });
     </script>
 </head>
